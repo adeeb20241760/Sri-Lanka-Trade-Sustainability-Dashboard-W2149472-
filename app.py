@@ -65,3 +65,27 @@ trade_data_lk.shape
 #------Initial Dashboard Setup------
 import streamlit as st
 st.title("How does Sri Lanka's foreign trade impact its economic sustainability?")
+
+#------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
+
+year_range = st.slider(
+    'Select Year Range', 
+    min_value=int(trade_data_lk['Year'].min()), 
+    max_value=int(trade_data_lk['Year'].max()), 
+    value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+    step=1
+)
+
+filtered_data = trade_data_lk[
+    (trade_data_lk['Year'] >= year_range[0]) & 
+    (trade_data_lk['Year'] <= year_range[1])
+]
+
+st.subheader(f"Import & Export Trends from {year_range[0]} to {year_range[1]}")
+st.bar_chart(
+    filtered_data, 
+    x='Year', 
+    y=['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)'],
+    stack=False,
+    y_label= 'USD($ Billions)',
+)
