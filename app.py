@@ -111,9 +111,9 @@ select_box_2 = st.selectbox("Select Service Export Indicators",
     options=[
         'ICT service exports (% of service exports, BoP)',
         'Travel services (% of service exports, BoP)',
-        'Transport services (% of commercial service exports)',,
+        'Transport services (% of commercial service exports)',
         'Insurance and financial services (% of commercial service exports)',
-        'Communications, computer, etc. (% of service exports, BoP)'
+        'Computer, communications and other services (% of commercial service exports)'
     ]
 )
 
