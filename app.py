@@ -81,16 +81,18 @@ filtered_data = trade_data_lk[
     (trade_data_lk['Year'] >= year_range[0]) & 
     (trade_data_lk['Year'] <= year_range[1])
 ]
-
 st.subheader(f"Import & Export Trends from {year_range[0]} to {year_range[1]}")
-st.bar_chart(
-    filtered_data, 
-    x='Year', 
-    y=['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)'],
-    stack=False,
-    y_label= 'USD($ Billions)',
-)
-
+v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
+if not filtered_data.empty and filtered_data[v1_cols].notna().any().any():
+    st.bar_chart(
+        filtered_data, 
+        x='Year', 
+        y=v1_cols,
+        stack=False,
+        y_label= 'USD($ Billions)',
+    )
+else:
+    st.info("Data for this period is not available.")
 #------Bar Chart: Service Export Trends (Visualization No.2 (V2))------
 st.subheader("Service Export Composition Over Time")
 
@@ -119,7 +121,10 @@ select_box_2 = st.selectbox("Select Service Export Indicators",
 
 st.write("You selected:", select_box_2)
 
-st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
+if not filtered_data_2.empty and filtered_data_2[select_box_2].notna().any():
+    st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
+else:
+    st.info("Data for this period is not available.")
 
 #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
 
@@ -200,17 +205,18 @@ filtered_data_4 = trade_data_lk[
     (trade_data_lk['Year'] <= year_range_4[1])
 ]
 # Create the plot
-fig = px.line(
-    filtered_data_4, 
-    x='Year', 
-    y='Net barter terms of trade index (2015 = 100)',
-    title="Net Barter Terms of Trade Over Time"
-)
+if not filtered_data_4.empty and filtered_data_4['Net barter terms of trade index (2015 = 100)'].notna().any():
+    fig = px.line(
+        filtered_data_4, 
+        x='Year', 
+        y='Net barter terms of trade index (2015 = 100)',
+        title="Net Barter Terms of Trade Over Time"
+    )
 
-
-
-# Display in Streamlit
-st.plotly_chart(fig)
+    # Display in Streamlit
+    st.plotly_chart(fig)
+else:
+    st.info("Data for this period is not available.")
 
 
 # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
@@ -227,16 +233,17 @@ filtered_data_5 = trade_data_lk[
     (trade_data_lk['Year'] >= year_range_5[0]) & 
     (trade_data_lk['Year'] <= year_range_5[1])
 ]
-fig_5 = px.line(
-    filtered_data_5, 
-    x='Year', 
-    y='Tariff rate, applied, weighted mean, all products (%)',
-    title="Tariff Rate Across The Years For All Products",
-    labels={
-        "Year": "Year",
-        "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"}
-)
+if not filtered_data_5.empty and filtered_data_5['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
+    fig_5 = px.line(
+        filtered_data_5, 
+        x='Year', 
+        y='Tariff rate, applied, weighted mean, all products (%)',
+        title="Tariff Rate Across The Years For All Products",
+        labels={
+            "Year": "Year",
+            "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"}
+    )
 
-st.plotly_chart(fig_5)
-
-
+    st.plotly_chart(fig_5)
+else:
+    st.info("Data for this period is not available.")
