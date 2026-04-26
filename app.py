@@ -120,3 +120,67 @@ st.write("You selected:", select_box_2)
 
 st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
 
+#------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
+
+#Year selector 
+available_years_3 = sorted(trade_data_lk['Year'].unique(), reverse=True)
+
+selected_year_3 = st.selectbox(
+    "Select Year",
+    options=available_years_3,
+    key='sunburst_year'
+)
+
+#Building the dataframe
+merch_indicators = {
+    'Merchandise exports to high-income economies (% of total merchandise exports)':
+        ('High-Income Countries', 'High-Income Countries', 'High-Income Countries'),
+
+    'Merchandise exports to low- and middle-income economies in East Asia & Pacific (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Outside Region', 'East Asia & Pacific'),
+
+    'Merchandise exports to low- and middle-income economies in Europe & Central Asia (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Outside Region', 'Europe & Central Asia'),
+
+    'Merchandise exports to low- and middle-income economies in Latin America & the Caribbean (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Outside Region', 'Latin America & Caribbean'),
+
+    'Merchandise exports to low- and middle-income economies in Middle East & North Africa (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Outside Region', 'Middle East & North Africa'),
+
+    'Merchandise exports to low- and middle-income economies in Sub-Saharan Africa (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Outside Region', 'Sub-Saharan Africa'),
+
+    'Merchandise exports to low- and middle-income economies in South Asia (% of total merchandise exports)':
+        ('Low/Middle Income Countries', 'Inside Region', 'South Asia'),
+
+    'Merchandise exports by the reporting economy, residual (% of total merchandise exports)':
+        ('Other (Residual)', 'Other (Residual)', 'Other (Residual)'),
+}
+rows = []
+for indicator, (level1, level2, level3) in merch_indicators.items():
+    if indicator in trade_data_lk.columns:
+        val_series = trade_data_lk.loc[trade_data_lk['Year'] == selected_year_3, indicator]
+        if not val_series.empty:
+            rows.append({
+                'Level 1': level1,
+                'Level 2': level2,
+                'Level 3': level3,
+                'Value': val_series.values[0]
+            })
+
+    sunburst_df = pd.DataFrame(rows)
+
+#Drawing the sunburst chart 
+if not sunburst_df.empty:
+    fig = px.sunburst(
+        sunburst_df,
+        path=['Level 1', 'Level 2', 'Level 3'],
+        values='Value',
+        title=f'Merchandise Export Destinations — {selected_year_3}',
+        color='Level 1',
+    )
+    st.subheader("Merchandise Export Destinations Distribution")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info(f"No merchandise export data available for {selected_year_3}.")
