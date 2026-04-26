@@ -61,3 +61,7 @@ trade_data_lk[~trade_data_lk['Year'].between(1960, 2024)].any()
 trade_data_lk.dtypes
 
 trade_data_lk.shape
+
+#------Initial Dashboard Setup------
+import streamlit as st
+st.title("How does Sri Lanka's foreign trade impact its economic sustainability?")
