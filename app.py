@@ -213,3 +213,30 @@ fig = px.line(
 st.plotly_chart(fig)
 
 
+# ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
+
+year_range_5= st.slider(
+    'Select Year Range', 
+    min_value=int(trade_data_lk['Year'].min()), 
+    max_value=int(trade_data_lk['Year'].max()), 
+    value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+    step=1,
+    key = 'slider_5'
+)
+filtered_data_5 = trade_data_lk[
+    (trade_data_lk['Year'] >= year_range_5[0]) & 
+    (trade_data_lk['Year'] <= year_range_5[1])
+]
+fig_5 = px.line(
+    filtered_data_5, 
+    x='Year', 
+    y='Tariff rate, applied, weighted mean, all products (%)',
+    title="Tariff Rate Across The Years For All Products",
+    labels={
+        "Year": "Year",
+        "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"}
+)
+
+st.plotly_chart(fig_5)
+
+
