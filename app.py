@@ -124,8 +124,7 @@ st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
 #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
 
 #Year selector 
-available_years_3 = sorted(trade_data_lk['Year'].unique(), reverse=True)
-
+available_years_3 = sorted([y for y in trade_data_lk['Year'].unique() if y != 2024], reverse=True)
 selected_year_3 = st.selectbox(
     "Select Year",
     options=available_years_3,
