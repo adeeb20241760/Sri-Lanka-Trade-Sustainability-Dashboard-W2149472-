@@ -40,7 +40,8 @@ print(trade_data_lk)
     
 #Removing NaN values from the dataset by removing rows with NaN values
 trade_data_lk.isnull().sum()
-trade_data_lk.dropna(axis = 0, inplace=True)
+trade_data_lk['Year'] = pd.to_numeric(trade_data_lk['Year'], errors='coerce')
+trade_data_lk = trade_data_lk.dropna(subset=['Year'])
 trade_data_lk['Year'] = trade_data_lk['Year'].astype(int)
 
 #------Testing------
