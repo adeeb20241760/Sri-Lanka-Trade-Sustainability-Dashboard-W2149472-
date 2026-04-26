@@ -184,3 +184,32 @@ if not sunburst_df.empty:
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.info(f"No merchandise export data available for {selected_year_3}.")
+
+#------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
+
+year_range_4= st.slider(
+    'Select Year Range', 
+    min_value=int(trade_data_lk['Year'].min()), 
+    max_value=int(trade_data_lk['Year'].max()), 
+    value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+    step=1,
+    key = 'slider_4'
+)
+filtered_data_4 = trade_data_lk[
+    (trade_data_lk['Year'] >= year_range_4[0]) & 
+    (trade_data_lk['Year'] <= year_range_4[1])
+]
+# Create the plot
+fig = px.line(
+    filtered_data_4, 
+    x='Year', 
+    y='Net barter terms of trade index (2015 = 100)',
+    title="Net Barter Terms of Trade Over Time"
+)
+
+
+
+# Display in Streamlit
+st.plotly_chart(fig)
+
+
