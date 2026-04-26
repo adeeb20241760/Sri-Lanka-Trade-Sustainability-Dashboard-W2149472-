@@ -40,6 +40,24 @@ print(trade_data_lk)
     
 #Removing NaN values from the dataset by removing rows with NaN values
 trade_data_lk.isnull().sum()
-trade_data_lk.dropna(subset=['Year'], inplace=True)
+trade_data_lk.dropna(axis = 0, inplace=True)
 trade_data_lk['Year'] = trade_data_lk['Year'].astype(int)
 
+#------Testing------
+
+#Checking for duplicates in the dataset
+trade_data_lk.duplicated().any()
+
+#Checking for negative values in the dataset
+(trade_data_lk.select_dtypes(include=['float64', 'int64']) < 0).any()
+
+#Checking for null values in the dataset
+trade_data_lk.isnull().sum().any()
+
+#Checking invalid Year values
+trade_data_lk[~trade_data_lk['Year'].between(1960, 2024)].any()
+
+#Checking invalid data types
+trade_data_lk.dtypes
+
+trade_data_lk.shape
