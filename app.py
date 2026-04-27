@@ -78,7 +78,7 @@ tab_macro, tab_partners, tab_metrics , tab_dataset = st.tabs([
 
 #------Macroeconomic Trends Tab------
 with tab_macro:
-    st.header("Macroeconomic Trends in Sri Lanka's Trade")
+    st.markdown("<h1 style='text-align: center;'>Macroeconomic Trends </h1>", unsafe_allow_html=True)    
     col1 , col2 = st.columns(2)
     with col1:
         #------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
@@ -145,7 +145,8 @@ with tab_macro:
 
         #------Partner Composition Tab------
 with tab_partners:
-    st.header("Sri Lanka's Trade Partner Composition")
+    st.markdown("<h1 style='text-align: center;'>Sri Lanka's Trade Partner Composition</h1>", unsafe_allow_html=True)    
+
 
     #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
 
@@ -213,7 +214,8 @@ with tab_partners:
 
 #------Trade Metrics Tab------
 with tab_metrics:
-    st.header("Trade Metrics")
+    st.markdown("<h1 style='text-align: center;'> Trade Metrics </h1>", unsafe_allow_html=True)    
+
 
     col4 , col5 = st.columns(2)
     #------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
@@ -420,7 +422,8 @@ with tab_metrics:
 
 with tab_dataset:
 
-    st.header("Dataset Overview")
+    st.markdown("<h1 style='text-align: center;'> Sri Lanka Trade Dataset Overview </h1>", unsafe_allow_html=True)    
+
     st.dataframe(trade_data_lk)
     st.download_button(
         label="Download Dataset as CSV",
