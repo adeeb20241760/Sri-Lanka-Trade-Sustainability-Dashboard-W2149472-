@@ -97,7 +97,9 @@ with tab_macro:
     with col1:
         #------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
         st.subheader(f"Import & Export Trends over time")
-
+        kpi1, kpi2 = st.columns(2)
+        kpi1.metric("Latest Import Value","$22.3 Billion", "16% increase from previous year")
+        kpi2.metric("Latest Export Value","$19.7 Billion", "14% increase from previous year")
         v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
         if not filtered_df.empty and filtered_df[v1_cols].notna().any().any():
             st.bar_chart(
@@ -114,7 +116,8 @@ with tab_macro:
 
         #------Bar Chart: Service Export Trends (Visualization No.2 (V2))------
             st.subheader("Service Export Composition Over Time")
-
+            kpi5, kpi6 = st.columns(2)
+            kpi5.metric("Latest Service Export Value","$14.1 Billion", "17% decrease from previous year", delta_color="inverse",delta_arrow="down")
             select_box_2 = st.selectbox("Select Service Export Indicators",
                 options=[
                     'ICT service exports (% of service exports, BoP)',
@@ -138,6 +141,9 @@ with tab_partners:
 
 
     #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
+    kpi3, kpi4 = st.columns(2)  
+    kpi3.metric("High Income Countries","Dominant Partner", "74.1% of total merchandise exports", delta_arrow= "off")
+    kpi4.metric("Low/Middle Income Countries","South Asia", "10.3% of total merchandise exports", delta_arrow= "off")
     st.subheader("Merchandise Export Destinations Distribution")
     #Year selector 
     available_years_3 = sorted([y for y in filtered_df['Year'].unique() if y != 2024], reverse=True)
@@ -209,6 +215,7 @@ with tab_metrics:
     #------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
     with col4:
         st.header("Net Barter Terms of Trade Over Time")
+        col4.metric("Latest Terms of Trade Value","85.6", "3.4% decrease from previous year", delta_color="inverse", delta_arrow="down")
         # Define the column and threshold
         trade_col = 'Net barter terms of trade index (2015 = 100)'
         threshold = 100
@@ -368,6 +375,7 @@ with tab_metrics:
     with col5:
         # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
         st.header("Tariff Rate Across The Years")
+        col5.metric("Latest Tariff Rate","4.3%", "31.7% decrease from previous year",delta_color="inverse", delta_arrow="down")
         import statsmodels.api as sm
         if not filtered_df.empty and filtered_df['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
             fig_5 = px.scatter(
@@ -387,7 +395,8 @@ with tab_metrics:
 with tab_dataset:
 
     st.markdown("<h1 style='text-align: center;'> Sri Lanka Trade Dataset Overview </h1>", unsafe_allow_html=True)    
-    
+    kpi7, kpi8 = st.columns(2)
+    kpi7.metric("The Humanitarian Data Exchange",f"{len(trade_data_lk) * len(trade_data_lk.columns)} Records", "https://data.humdata.org/dataset/world-bank-trade-indicators-for-sri-lanka ")
     indicator_options = [col for col in filtered_df.columns if col != 'Year']
 
     # Checkbox to toggle between selecting all or none of the indicators
