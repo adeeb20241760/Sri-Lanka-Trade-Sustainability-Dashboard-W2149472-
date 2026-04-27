@@ -9,8 +9,7 @@ trade_data_lk = pd.read_excel('trade_lka.xlsx')
 #Removing unnecessary columns
 trade_data_lk.drop(columns=[ 'Indicator Code', 'Country Name','Country ISO3'], inplace=True)
 #hecking Data Types
-trade_data_lk.dtypes 
-#Rounding Value column to 2 decimal places
+print(trade_data_lk.dtypes )#Rounding Value column to 2 decimal places
 trade_data_lk['Value'] = trade_data_lk['Value'].round(2)
 #Dealing with large currency values
 trade_data_lk.loc[trade_data_lk['Value'] > 1000, 'Value'] = trade_data_lk['Value'] / 1e9
@@ -30,7 +29,7 @@ indicator_rename = {
 
         
 }
-trade_data_lk['Indicator Name']
+print(trade_data_lk['Indicator Name'])
 
 trade_data_lk['Indicator Name'] = trade_data_lk['Indicator Name'].replace(indicator_rename)
 #Pivoting the data to have 'Year' as index and 'Indicator Name' as columns
@@ -59,9 +58,8 @@ trade_data_lk.isnull().sum().any()
 trade_data_lk[~trade_data_lk['Year'].between(1960, 2024)].any()
 
 #Checking invalid data types
-trade_data_lk.dtypes
-
-trade_data_lk.shape
+print(trade_data_lk.dtypes)
+print(trade_data_lk.shape)
 
 #------Initial Dashboard Setup------
 import streamlit as st
