@@ -77,60 +77,62 @@ tab_macro, tab_partners, tab_metrics = st.tabs([
 #------Macroeconomic Trends Tab------
 with tab_macro:
     st.header("Macroeconomic Trends in Sri Lanka's Trade")
-#------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
+    col1 , col2 = st.columns(2)
+    with col1:
+        #------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
 
-    year_range = st.slider(
-        'Select Year Range', 
-        min_value=int(trade_data_lk['Year'].min()), 
-        max_value=int(trade_data_lk['Year'].max()), 
-        value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-        step=1
-    )
-
-    filtered_data = trade_data_lk[
-        (trade_data_lk['Year'] >= year_range[0]) & 
-        (trade_data_lk['Year'] <= year_range[1])
-    ]
-    st.subheader(f"Import & Export Trends from {year_range[0]} to {year_range[1]}")
-    v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
-    if not filtered_data.empty and filtered_data[v1_cols].notna().any().any():
-        st.bar_chart(
-            filtered_data, 
-            x='Year', 
-            y=v1_cols,
-            stack=False,
-            y_label= 'USD($ Billions)',
+        year_range = st.slider(
+            'Select Year Range', 
+            min_value=int(trade_data_lk['Year'].min()), 
+            max_value=int(trade_data_lk['Year'].max()), 
+            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+            step=1
         )
-    else:
-        st.info("Data for this period is not available.")
 
-#------Bar Chart: Service Export Trends (Visualization No.2 (V2))------
-    st.subheader("Service Export Composition Over Time")
-
-    year_range_2 = st.slider(
-        'Select Year Range', 
-        min_value=int(trade_data_lk['Year'].min()), 
-        max_value=int(trade_data_lk['Year'].max()), 
-        value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-        step=1,
-        key = 'slider_2'
-    )
-
-    filtered_data_2 = trade_data_lk[
-        (trade_data_lk['Year'] >= year_range_2[0]) & 
-        (trade_data_lk['Year'] <= year_range_2[1])
-    ]
-    select_box_2 = st.selectbox("Select Service Export Indicators",
-        options=[
-            'ICT service exports (% of service exports, BoP)',
-            'Travel services (% of service exports, BoP)',
-            'Transport services (% of commercial service exports)',
-            'Insurance and financial services (% of commercial service exports)',
-            'Computer, communications and other services (% of commercial service exports)'
+        filtered_data = trade_data_lk[
+            (trade_data_lk['Year'] >= year_range[0]) & 
+            (trade_data_lk['Year'] <= year_range[1])
         ]
-    )
+        st.subheader(f"Import & Export Trends from {year_range[0]} to {year_range[1]}")
+        v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
+        if not filtered_data.empty and filtered_data[v1_cols].notna().any().any():
+            st.bar_chart(
+                filtered_data, 
+                x='Year', 
+                y=v1_cols,
+                stack=False,
+                y_label= 'USD($ Billions)',
+            )
+        else:
+            st.info("Data for this period is not available.")
+    
+    with col2:
 
-    st.write("You selected:", select_box_2)
+        #------Bar Chart: Service Export Trends (Visualization No.2 (V2))------
+            st.subheader("Service Export Composition Over Time")
+
+            year_range_2 = st.slider(
+                'Select Year Range', 
+                min_value=int(trade_data_lk['Year'].min()), 
+                max_value=int(trade_data_lk['Year'].max()), 
+                value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+                step=1,
+                key = 'slider_2'
+            )
+
+            filtered_data_2 = trade_data_lk[
+                (trade_data_lk['Year'] >= year_range_2[0]) & 
+                (trade_data_lk['Year'] <= year_range_2[1])
+            ]
+            select_box_2 = st.selectbox("Select Service Export Indicators",
+                options=[
+                    'ICT service exports (% of service exports, BoP)',
+                    'Travel services (% of service exports, BoP)',
+                    'Transport services (% of commercial service exports)',
+                    'Insurance and financial services (% of commercial service exports)',
+                    'Computer, communications and other services (% of commercial service exports)'
+                ]
+            )
 
     if not filtered_data_2.empty and filtered_data_2[select_box_2].notna().any():
         st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
@@ -236,179 +238,194 @@ with tab_metrics:
             y=trade_col,
             title="Net Barter Terms of Trade Over Time"
         )
-        
-        # Filter out rows where the trade_col value is NaN for robust plotting
-        plot_data = filtered_data_4.dropna(subset=[trade_col]).copy()
+        filtered_data_4 = trade_data_lk[
+            (trade_data_lk['Year'] >= year_range_4[0]) & 
+            (trade_data_lk['Year'] <= year_range_4[1])
+        ]
+        # Define the column and threshold
+        trade_col = 'Net barter terms of trade index (2015 = 100)'
+        threshold = 100
 
-        if not plot_data.empty:
-            fig = go.Figure()
+        # Create the plot
+        if not filtered_data_4.empty and filtered_data_4[trade_col].notna().any():
+            fig = px.line(
+                filtered_data_4, 
+                x='Year', 
+                y=trade_col,
+                title="Net Barter Terms of Trade Over Time"
+            )
+            
+            # Filter out rows where the trade_col value is NaN for robust plotting
+            plot_data = filtered_data_4.dropna(subset=[trade_col]).copy()
 
-            x_data = plot_data['Year'].values
-            y_data = plot_data[trade_col].values
+            if not plot_data.empty:
+                fig = go.Figure()
 
-            # Add fill traces (polygons) first to ensure they are behind the lines
-            for i in range(len(x_data) - 1):
-                x1, y1 = x_data[i], y_data[i]
-                x2, y_data_next = x_data[i+1], y_data[i+1]
+                x_data = plot_data['Year'].values
+                y_data = plot_data[trade_col].values
 
-                # Calculate intersection point if the line crosses the threshold
-                intersect_x = None
-                if (y1 > threshold and y_data_next < threshold) or \
-                (y1 < threshold and y_data_next > threshold):
-                    if x2 == x1: # Should not happen with year data
-                        intersect_x = x1
-                    else:
-                        slope = (y_data_next - y1) / (x2 - x1)
-                        if slope != 0:
-                            intersect_x = x1 + (threshold - y1) / slope
-                        # If slope is 0 and it's crossing, it means it's a horizontal line at threshold,
-                        # which is handled by the non-crossing cases or results in no fill.
+                # Add fill traces (polygons) first to ensure they are behind the lines
+                for i in range(len(x_data) - 1):
+                    x1, y1 = x_data[i], y_data[i]
+                    x2, y_data_next = x_data[i+1], y_data[i+1]
 
-                # Case 1: Entire segment above or at threshold
-                if y1 >= threshold and y_data_next >= threshold:
-                    fig.add_trace(go.Scatter(
-                        x=[x1, x2, x2, x1],
-                        y=[y1, y_data_next, threshold, threshold],
-                        fill='toself',
-                        fillcolor='rgba(0, 255, 0, 0.1)', # Light green
-                        mode='none',
-                        hoverinfo='skip',
-                        showlegend=False
-                    ))
-                # Case 2: Entire segment below or at threshold
-                elif y1 <= threshold and y_data_next <= threshold:
-                    fig.add_trace(go.Scatter(
-                        x=[x1, x2, x2, x1],
-                        y=[y1, y_data_next, threshold, threshold],
-                        fill='toself',
-                        fillcolor='rgba(255, 0, 0, 0.1)', # Light red
-                        mode='none',
-                        hoverinfo='skip',
-                        showlegend=False
-                    ))
-                # Case 3: Segment crosses the threshold
-                elif intersect_x is not None:
-                    if y1 > threshold: # Starts above, goes below
-                        # Green part (from x1 to intersect_x)
+                    # Calculate intersection point if the line crosses the threshold
+                    intersect_x = None
+                    if (y1 > threshold and y_data_next < threshold) or \
+                    (y1 < threshold and y_data_next > threshold):
+                        if x2 == x1: # Should not happen with year data
+                            intersect_x = x1
+                        else:
+                            slope = (y_data_next - y1) / (x2 - x1)
+                            if slope != 0:
+                                intersect_x = x1 + (threshold - y1) / slope
+                            # If slope is 0 and it's crossing, it means it's a horizontal line at threshold,
+                            # which is handled by the non-crossing cases or results in no fill.
+
+                    # Case 1: Entire segment above or at threshold
+                    if y1 >= threshold and y_data_next >= threshold:
                         fig.add_trace(go.Scatter(
-                            x=[x1, intersect_x, intersect_x, x1],
-                            y=[y1, threshold, threshold, y1],
+                            x=[x1, x2, x2, x1],
+                            y=[y1, y_data_next, threshold, threshold],
                             fill='toself',
-                            fillcolor='rgba(0, 255, 0, 0.1)',
+                            fillcolor='rgba(0, 255, 0, 0.1)', # Light green
                             mode='none',
                             hoverinfo='skip',
                             showlegend=False
                         ))
-                        # Red part (from intersect_x to x2)
+                    # Case 2: Entire segment below or at threshold
+                    elif y1 <= threshold and y_data_next <= threshold:
                         fig.add_trace(go.Scatter(
-                            x=[intersect_x, x2, x2, intersect_x],
-                            y=[threshold, y_data_next, threshold, threshold],
+                            x=[x1, x2, x2, x1],
+                            y=[y1, y_data_next, threshold, threshold],
                             fill='toself',
-                            fillcolor='rgba(255, 0, 0, 0.1)',
+                            fillcolor='rgba(255, 0, 0, 0.1)', # Light red
                             mode='none',
                             hoverinfo='skip',
                             showlegend=False
                         ))
-                    else: # Starts below, goes above
-                        # Red part (from x1 to intersect_x)
-                        fig.add_trace(go.Scatter(
-                            x=[x1, intersect_x, intersect_x, x1],
-                            y=[y1, threshold, threshold, y1],
-                            fill='toself',
-                            fillcolor='rgba(255, 0, 0, 0.1)',
-                            mode='none',
-                            hoverinfo='skip',
-                            showlegend=False
-                        ))
-                        # Green part (from intersect_x to x2)
-                        fig.add_trace(go.Scatter(
-                            x=[intersect_x, x2, x2, intersect_x],
-                            y=[threshold, y_data_next, threshold, threshold],
-                            fill='toself',
-                            fillcolor='rgba(0, 255, 0, 0.1)',
-                            mode='none',
-                            hoverinfo='skip',
-                            showlegend=False
-                        ))
+                    # Case 3: Segment crosses the threshold
+                    elif intersect_x is not None:
+                        if y1 > threshold: # Starts above, goes below
+                            # Green part (from x1 to intersect_x)
+                            fig.add_trace(go.Scatter(
+                                x=[x1, intersect_x, intersect_x, x1],
+                                y=[y1, threshold, threshold, y1],
+                                fill='toself',
+                                fillcolor='rgba(0, 255, 0, 0.1)',
+                                mode='none',
+                                hoverinfo='skip',
+                                showlegend=False
+                            ))
+                            # Red part (from intersect_x to x2)
+                            fig.add_trace(go.Scatter(
+                                x=[intersect_x, x2, x2, intersect_x],
+                                y=[threshold, y_data_next, threshold, threshold],
+                                fill='toself',
+                                fillcolor='rgba(255, 0, 0, 0.1)',
+                                mode='none',
+                                hoverinfo='skip',
+                                showlegend=False
+                            ))
+                        else: # Starts below, goes above
+                            # Red part (from x1 to intersect_x)
+                            fig.add_trace(go.Scatter(
+                                x=[x1, intersect_x, intersect_x, x1],
+                                y=[y1, threshold, threshold, y1],
+                                fill='toself',
+                                fillcolor='rgba(255, 0, 0, 0.1)',
+                                mode='none',
+                                hoverinfo='skip',
+                                showlegend=False
+                            ))
+                            # Green part (from intersect_x to x2)
+                            fig.add_trace(go.Scatter(
+                                x=[intersect_x, x2, x2, intersect_x],
+                                y=[threshold, y_data_next, threshold, threshold],
+                                fill='toself',
+                                fillcolor='rgba(0, 255, 0, 0.1)',
+                                mode='none',
+                                hoverinfo='skip',
+                                showlegend=False
+                            ))
 
-            # Add the main line (on top of fills)
-            fig.add_trace(go.Scatter(
-                x=plot_data['Year'],
-                y=plot_data[trade_col],
-                mode='lines',
-                name='Net Barter Terms of Trade',
-                line=dict(color='blue', width=2),
-                hovertemplate='Year: %{x}<br>Value: %{y:.2f}<extra></extra>'
-            ))
+                # Add the main line (on top of fills)
+                fig.add_trace(go.Scatter(
+                    x=plot_data['Year'],
+                    y=plot_data[trade_col],
+                    mode='lines',
+                    name='Net Barter Terms of Trade',
+                    line=dict(color='blue', width=2),
+                    hovertemplate='Year: %{x}<br>Value: %{y:.2f}<extra></extra>'
+                ))
 
-            # Add the threshold line (on top of fills)
-            fig.add_trace(go.Scatter(
-                x=plot_data['Year'],
-                y=[threshold] * len(plot_data),
-                mode='lines',
-                name=f'Threshold ({threshold})',
-                line=dict(color='gray', dash='dash', width=1),
-                hoverinfo='skip'
-            ))
+                # Add the threshold line (on top of fills)
+                fig.add_trace(go.Scatter(
+                    x=plot_data['Year'],
+                    y=[threshold] * len(plot_data),
+                    mode='lines',
+                    name=f'Threshold ({threshold})',
+                    line=dict(color='gray', dash='dash', width=1),
+                    hoverinfo='skip'
+                ))
 
-            # Add dummy traces for legend entries for the fill areas
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None],
-                mode='markers',
-                marker=dict(size=10, color='rgba(0, 255, 0, 0.1)', symbol='square'),
-                name='Above 100 (Fill)',
-                hoverinfo='skip'
-            ))
-            fig.add_trace(go.Scatter(
-                x=[None], y=[None],
-                mode='markers',
-                marker=dict(size=10, color='rgba(255, 0, 0, 0.1)', symbol='square'),
-                name='Below 100 (Fill)',
-                hoverinfo='skip'
-            ))
+                # Add dummy traces for legend entries for the fill areas
+                fig.add_trace(go.Scatter(
+                    x=[None], y=[None],
+                    mode='markers',
+                    marker=dict(size=10, color='rgba(0, 255, 0, 0.1)', symbol='square'),
+                    name='Above 100 (Fill)',
+                    hoverinfo='skip'
+                ))
+                fig.add_trace(go.Scatter(
+                    x=[None], y=[None],
+                    mode='markers',
+                    marker=dict(size=10, color='rgba(255, 0, 0, 0.1)', symbol='square'),
+                    name='Below 100 (Fill)',
+                    hoverinfo='skip'
+                ))
 
-            fig.update_layout(
-                title="Net Barter Terms of Trade Over Time",
-                xaxis_title="Year",
-                yaxis_title=trade_col,
-                hovermode="x unified"
+                fig.update_layout(
+                    title="Net Barter Terms of Trade Over Time",
+                    xaxis_title="Year",
+                    yaxis_title=trade_col,
+                    hovermode="x unified"
+                )
+
+                st.plotly_chart(fig)
+            else:
+                st.info("No valid data points for this period after removing NaNs.")
+            # Display in Streamlit
+        else:
+            st.info("Data for this period is not available.")
+
+    with col5:
+        # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
+        year_range_5= st.slider(
+            'Select Year Range', 
+            min_value=int(trade_data_lk['Year'].min()), 
+            max_value=int(trade_data_lk['Year'].max()), 
+            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+            step=1,
+            key = 'slider_5'
+        )
+        filtered_data_5 = trade_data_lk[
+            (trade_data_lk['Year'] >= year_range_5[0]) & 
+            (trade_data_lk['Year'] <= year_range_5[1])
+        ]
+        import statsmodels.api as sm
+        if not filtered_data_5.empty and filtered_data_5['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
+            fig_5 = px.scatter(
+                filtered_data_5, 
+                x='Year', 
+                y='Tariff rate, applied, weighted mean, all products (%)',
+                title="Tariff Rate Across The Years For All Products",
+                labels={
+                    "Year": "Year",
+                    "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"},
+                trendline="ols"
             )
 
-            st.plotly_chart(fig)
+            st.plotly_chart(fig_5)
         else:
-            st.info("No valid data points for this period after removing NaNs.")
-        # Display in Streamlit
-    else:
-        st.info("Data for this period is not available.")
-
-
-    # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
-
-    year_range_5= st.slider(
-        'Select Year Range', 
-        min_value=int(trade_data_lk['Year'].min()), 
-        max_value=int(trade_data_lk['Year'].max()), 
-        value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-        step=1,
-        key = 'slider_5'
-    )
-    filtered_data_5 = trade_data_lk[
-        (trade_data_lk['Year'] >= year_range_5[0]) & 
-        (trade_data_lk['Year'] <= year_range_5[1])
-    ]
-    import statsmodels.api as sm
-    if not filtered_data_5.empty and filtered_data_5['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
-        fig_5 = px.scatter(
-            filtered_data_5, 
-            x='Year', 
-            y='Tariff rate, applied, weighted mean, all products (%)',
-            title="Tariff Rate Across The Years For All Products",
-            labels={
-                "Year": "Year",
-                "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"},
-            trendline="ols"
-        )
-
-        st.plotly_chart(fig_5)
-    else:
-        st.info("Data for this period is not available.")
+            st.info("Data for this period is not available.")
