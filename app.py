@@ -134,12 +134,14 @@ with tab_macro:
                 ]
             )
 
-    if not filtered_data_2.empty and filtered_data_2[select_box_2].notna().any():
-        st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
-    else:
-        st.info("Data for this period is not available.")
+            st.write("You selected:", select_box_2)
 
-#------Partner Composition Tab------
+            if not filtered_data_2.empty and filtered_data_2[select_box_2].notna().any():
+                st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
+            else:
+                st.info("Data for this period is not available.")
+
+        #------Partner Composition Tab------
 with tab_partners:
     st.header("Sri Lanka's Trade Partner Composition")
 
@@ -211,32 +213,16 @@ with tab_partners:
 with tab_metrics:
     st.header("Trade Metrics")
 
-
+    col4 , col5 = st.columns(2)
     #------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
-
-    year_range_4= st.slider(
-        'Select Year Range', 
-        min_value=int(trade_data_lk['Year'].min()), 
-        max_value=int(trade_data_lk['Year'].max()), 
-        value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-        step=1,
-        key = 'slider_4'
-    )
-    filtered_data_4 = trade_data_lk[
-        (trade_data_lk['Year'] >= year_range_4[0]) & 
-        (trade_data_lk['Year'] <= year_range_4[1])
-    ]
-    # Define the column and threshold
-    trade_col = 'Net barter terms of trade index (2015 = 100)'
-    threshold = 100
-
-    # Create the plot
-    if not filtered_data_4.empty and filtered_data_4[trade_col].notna().any():
-        fig = px.line(
-            filtered_data_4, 
-            x='Year', 
-            y=trade_col,
-            title="Net Barter Terms of Trade Over Time"
+    with col4:
+        year_range_4= st.slider(
+            'Select Year Range', 
+            min_value=int(trade_data_lk['Year'].min()), 
+            max_value=int(trade_data_lk['Year'].max()), 
+            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+            step=1,
+            key = 'slider_4'
         )
         filtered_data_4 = trade_data_lk[
             (trade_data_lk['Year'] >= year_range_4[0]) & 
