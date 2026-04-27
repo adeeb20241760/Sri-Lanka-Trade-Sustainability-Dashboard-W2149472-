@@ -204,17 +204,160 @@ filtered_data_4 = trade_data_lk[
     (trade_data_lk['Year'] >= year_range_4[0]) & 
     (trade_data_lk['Year'] <= year_range_4[1])
 ]
+# Define the column and threshold
+trade_col = 'Net barter terms of trade index (2015 = 100)'
+threshold = 100
+
 # Create the plot
-if not filtered_data_4.empty and filtered_data_4['Net barter terms of trade index (2015 = 100)'].notna().any():
+if not filtered_data_4.empty and filtered_data_4[trade_col].notna().any():
     fig = px.line(
         filtered_data_4, 
         x='Year', 
-        y='Net barter terms of trade index (2015 = 100)',
+        y=trade_col,
         title="Net Barter Terms of Trade Over Time"
     )
+    
+    # Filter out rows where the trade_col value is NaN for robust plotting
+    plot_data = filtered_data_4.dropna(subset=[trade_col]).copy()
 
+    if not plot_data.empty:
+        fig = go.Figure()
+
+        x_data = plot_data['Year'].values
+        y_data = plot_data[trade_col].values
+
+        # Add fill traces (polygons) first to ensure they are behind the lines
+        for i in range(len(x_data) - 1):
+            x1, y1 = x_data[i], y_data[i]
+            x2, y_data_next = x_data[i+1], y_data[i+1]
+
+            # Calculate intersection point if the line crosses the threshold
+            intersect_x = None
+            if (y1 > threshold and y_data_next < threshold) or \
+               (y1 < threshold and y_data_next > threshold):
+                if x2 == x1: # Should not happen with year data
+                    intersect_x = x1
+                else:
+                    slope = (y_data_next - y1) / (x2 - x1)
+                    if slope != 0:
+                        intersect_x = x1 + (threshold - y1) / slope
+                    # If slope is 0 and it's crossing, it means it's a horizontal line at threshold,
+                    # which is handled by the non-crossing cases or results in no fill.
+
+            # Case 1: Entire segment above or at threshold
+            if y1 >= threshold and y_data_next >= threshold:
+                fig.add_trace(go.Scatter(
+                    x=[x1, x2, x2, x1],
+                    y=[y1, y_data_next, threshold, threshold],
+                    fill='toself',
+                    fillcolor='rgba(0, 255, 0, 0.1)', # Light green
+                    mode='none',
+                    hoverinfo='skip',
+                    showlegend=False
+                ))
+            # Case 2: Entire segment below or at threshold
+            elif y1 <= threshold and y_data_next <= threshold:
+                fig.add_trace(go.Scatter(
+                    x=[x1, x2, x2, x1],
+                    y=[y1, y_data_next, threshold, threshold],
+                    fill='toself',
+                    fillcolor='rgba(255, 0, 0, 0.1)', # Light red
+                    mode='none',
+                    hoverinfo='skip',
+                    showlegend=False
+                ))
+            # Case 3: Segment crosses the threshold
+            elif intersect_x is not None:
+                if y1 > threshold: # Starts above, goes below
+                    # Green part (from x1 to intersect_x)
+                    fig.add_trace(go.Scatter(
+                        x=[x1, intersect_x, intersect_x, x1],
+                        y=[y1, threshold, threshold, y1],
+                        fill='toself',
+                        fillcolor='rgba(0, 255, 0, 0.1)',
+                        mode='none',
+                        hoverinfo='skip',
+                        showlegend=False
+                    ))
+                    # Red part (from intersect_x to x2)
+                    fig.add_trace(go.Scatter(
+                        x=[intersect_x, x2, x2, intersect_x],
+                        y=[threshold, y_data_next, threshold, threshold],
+                        fill='toself',
+                        fillcolor='rgba(255, 0, 0, 0.1)',
+                        mode='none',
+                        hoverinfo='skip',
+                        showlegend=False
+                    ))
+                else: # Starts below, goes above
+                    # Red part (from x1 to intersect_x)
+                    fig.add_trace(go.Scatter(
+                        x=[x1, intersect_x, intersect_x, x1],
+                        y=[y1, threshold, threshold, y1],
+                        fill='toself',
+                        fillcolor='rgba(255, 0, 0, 0.1)',
+                        mode='none',
+                        hoverinfo='skip',
+                        showlegend=False
+                    ))
+                    # Green part (from intersect_x to x2)
+                    fig.add_trace(go.Scatter(
+                        x=[intersect_x, x2, x2, intersect_x],
+                        y=[threshold, y_data_next, threshold, threshold],
+                        fill='toself',
+                        fillcolor='rgba(0, 255, 0, 0.1)',
+                        mode='none',
+                        hoverinfo='skip',
+                        showlegend=False
+                    ))
+
+        # Add the main line (on top of fills)
+        fig.add_trace(go.Scatter(
+            x=plot_data['Year'],
+            y=plot_data[trade_col],
+            mode='lines',
+            name='Net Barter Terms of Trade',
+            line=dict(color='blue', width=2),
+            hovertemplate='Year: %{x}<br>Value: %{y:.2f}<extra></extra>'
+        ))
+
+        # Add the threshold line (on top of fills)
+        fig.add_trace(go.Scatter(
+            x=plot_data['Year'],
+            y=[threshold] * len(plot_data),
+            mode='lines',
+            name=f'Threshold ({threshold})',
+            line=dict(color='gray', dash='dash', width=1),
+            hoverinfo='skip'
+        ))
+
+        # Add dummy traces for legend entries for the fill areas
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='markers',
+            marker=dict(size=10, color='rgba(0, 255, 0, 0.1)', symbol='square'),
+            name='Above 100 (Fill)',
+            hoverinfo='skip'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='markers',
+            marker=dict(size=10, color='rgba(255, 0, 0, 0.1)', symbol='square'),
+            name='Below 100 (Fill)',
+            hoverinfo='skip'
+        ))
+
+        fig.update_layout(
+            title="Net Barter Terms of Trade Over Time",
+            xaxis_title="Year",
+            yaxis_title=trade_col,
+            hovermode="x unified"
+        )
+
+        st.plotly_chart(fig)
+    else:
+        st.info("No valid data points for this period after removing NaNs.")
     # Display in Streamlit
-    st.plotly_chart(fig)
 else:
     st.info("Data for this period is not available.")
 
