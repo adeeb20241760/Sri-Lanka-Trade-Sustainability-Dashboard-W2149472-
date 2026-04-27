@@ -69,10 +69,11 @@ st.set_page_config(layout="wide")
 st.title("How does Sri Lanka's foreign trade impact its economic sustainability?")
 
 # Setup the Tabs
-tab_macro, tab_partners, tab_metrics = st.tabs([
+tab_macro, tab_partners, tab_metrics , tab_dataset = st.tabs([
     "Macroeconomic Trends", 
     "Partner Composition", 
     "Trade Metrics"
+    "Dataset"
 ])
 
 #------Macroeconomic Trends Tab------
@@ -416,3 +417,14 @@ with tab_metrics:
             st.plotly_chart(fig_5)
         else:
             st.info("Data for this period is not available.")
+
+with tab_dataset:
+
+    st.header("Dataset Overview")
+    st.dataframe(trade_data_lk)
+    st.download_button(
+        label="Download Dataset as CSV",
+        data=trade_data_lk.to_csv(index=False).encode('utf-8'),
+        file_name='sri_lanka_trade_data.csv',
+        mime='text/csv'
+    )
