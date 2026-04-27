@@ -65,6 +65,7 @@ trade_data_lk.shape
 
 #------Initial Dashboard Setup------
 import streamlit as st
+st.set_page_config(layout="wide")
 st.title("How does Sri Lanka's foreign trade impact its economic sustainability?")
 
 # Setup the Tabs
