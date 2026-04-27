@@ -76,7 +76,6 @@ global_year_range = st.sidebar.slider(
     step=1
 )
 
-
 # Filter data once for all visualizations
 filtered_df = trade_data_lk[
     (trade_data_lk['Year'] >= global_year_range[0]) & 
@@ -389,10 +388,26 @@ with tab_dataset:
 
     st.markdown("<h1 style='text-align: center;'> Sri Lanka Trade Dataset Overview </h1>", unsafe_allow_html=True)    
     
-    st.dataframe(filtered_df)
+    indicator_options = [col for col in filtered_df.columns if col != 'Year']
+
+    # Checkbox to toggle between selecting all or none of the indicators
+    select_all = st.checkbox("Select all indicators", value=True)
+
+    selected_indicators = st.multiselect(
+        "Select indicators to display and download:",
+        options=indicator_options,
+        default=indicator_options if select_all else [],
+        help="You can use the checkbox above to quickly select or deselect all indicators."
+    )
+
+    # Always keep the 'Year' column and filter the dataframe based on user selection
+    cols_to_display = ['Year'] + selected_indicators
+    final_df = filtered_df[cols_to_display]
+
+    st.dataframe(final_df)
     st.download_button(
         label="Download Dataset as CSV",
-        data=filtered_df.to_csv(index=False).encode('utf-8'),
+        data=final_df.to_csv(index=False).encode('utf-8'),
         file_name='sri_lanka_trade_data.csv',
         mime='text/csv'
     )
