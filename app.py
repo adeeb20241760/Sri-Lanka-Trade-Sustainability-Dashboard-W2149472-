@@ -376,15 +376,17 @@ filtered_data_5 = trade_data_lk[
     (trade_data_lk['Year'] >= year_range_5[0]) & 
     (trade_data_lk['Year'] <= year_range_5[1])
 ]
+import statsmodels.api as sm
 if not filtered_data_5.empty and filtered_data_5['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
-    fig_5 = px.line(
+    fig_5 = px.scatter(
         filtered_data_5, 
         x='Year', 
         y='Tariff rate, applied, weighted mean, all products (%)',
         title="Tariff Rate Across The Years For All Products",
         labels={
             "Year": "Year",
-            "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"}
+            "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"},
+        trendline="ols"
     )
 
     st.plotly_chart(fig_5)
