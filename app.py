@@ -66,6 +66,22 @@ import streamlit as st
 st.set_page_config(layout="wide")
 st.title("How does Sri Lanka's foreign trade impact its economic sustainability?")
 
+#------Sidebar Controls------
+st.sidebar.header("Dashboard Controls")
+global_year_range = st.sidebar.slider(
+    'Select Year Range', 
+    min_value=int(trade_data_lk['Year'].min()), 
+    max_value=int(trade_data_lk['Year'].max()), 
+    value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
+    step=1
+)
+
+# Filter data once for all visualizations
+filtered_df = trade_data_lk[
+    (trade_data_lk['Year'] >= global_year_range[0]) & 
+    (trade_data_lk['Year'] <= global_year_range[1])
+]
+
 # Setup the Tabs
 tab_macro, tab_partners, tab_metrics , tab_dataset = st.tabs([
     "Macroeconomic Trends", 
@@ -82,22 +98,10 @@ with tab_macro:
         #------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
         st.subheader(f"Import & Export Trends over time")
 
-        year_range = st.slider(
-            'Select Year Range', 
-            min_value=int(trade_data_lk['Year'].min()), 
-            max_value=int(trade_data_lk['Year'].max()), 
-            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-            step=1
-        )
-
-        filtered_data = trade_data_lk[
-            (trade_data_lk['Year'] >= year_range[0]) & 
-            (trade_data_lk['Year'] <= year_range[1])
-        ]
         v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
-        if not filtered_data.empty and filtered_data[v1_cols].notna().any().any():
+        if not filtered_df.empty and filtered_df[v1_cols].notna().any().any():
             st.bar_chart(
-                filtered_data, 
+                filtered_df, 
                 x='Year', 
                 y=v1_cols,
                 stack=False,
@@ -111,19 +115,6 @@ with tab_macro:
         #------Bar Chart: Service Export Trends (Visualization No.2 (V2))------
             st.subheader("Service Export Composition Over Time")
 
-            year_range_2 = st.slider(
-                'Select Year Range', 
-                min_value=int(trade_data_lk['Year'].min()), 
-                max_value=int(trade_data_lk['Year'].max()), 
-                value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-                step=1,
-                key = 'slider_2'
-            )
-
-            filtered_data_2 = trade_data_lk[
-                (trade_data_lk['Year'] >= year_range_2[0]) & 
-                (trade_data_lk['Year'] <= year_range_2[1])
-            ]
             select_box_2 = st.selectbox("Select Service Export Indicators",
                 options=[
                     'ICT service exports (% of service exports, BoP)',
@@ -136,8 +127,8 @@ with tab_macro:
 
             st.write("You selected:", select_box_2)
 
-            if not filtered_data_2.empty and filtered_data_2[select_box_2].notna().any():
-                st.bar_chart(x='Year', y=[select_box_2], data=filtered_data_2)
+            if not filtered_df.empty and filtered_df[select_box_2].notna().any():
+                st.bar_chart(x='Year', y=[select_box_2], data=filtered_df)
             else:
                 st.info("Data for this period is not available.")
 
@@ -149,7 +140,7 @@ with tab_partners:
     #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
     st.subheader("Merchandise Export Destinations Distribution")
     #Year selector 
-    available_years_3 = sorted([y for y in trade_data_lk['Year'].unique() if y != 2024], reverse=True)
+    available_years_3 = sorted([y for y in filtered_df['Year'].unique() if y != 2024], reverse=True)
     selected_year_3 = st.selectbox(
         "Select Year",
         options=available_years_3,
@@ -185,7 +176,7 @@ with tab_partners:
     rows = []
     for indicator, (level1, level2, level3) in merch_indicators.items():
         if indicator in trade_data_lk.columns:
-            val_series = trade_data_lk.loc[trade_data_lk['Year'] == selected_year_3, indicator]
+            val_series = filtered_df.loc[filtered_df['Year'] == selected_year_3, indicator]
             if not val_series.empty:
                 rows.append({
                     'Level 1': level1,
@@ -218,32 +209,20 @@ with tab_metrics:
     #------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
     with col4:
         st.header("Net Barter Terms of Trade Over Time")
-        year_range_4= st.slider(
-            'Select Year Range', 
-            min_value=int(trade_data_lk['Year'].min()), 
-            max_value=int(trade_data_lk['Year'].max()), 
-            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-            step=1,
-            key = 'slider_4'
-        )
-        filtered_data_4 = trade_data_lk[
-            (trade_data_lk['Year'] >= year_range_4[0]) & 
-            (trade_data_lk['Year'] <= year_range_4[1])
-        ]
         # Define the column and threshold
         trade_col = 'Net barter terms of trade index (2015 = 100)'
         threshold = 100
 
         # Create the plot
-        if not filtered_data_4.empty and filtered_data_4[trade_col].notna().any():
+        if not filtered_df.empty and filtered_df[trade_col].notna().any():
             fig = px.line(
-                filtered_data_4, 
+                filtered_df, 
                 x='Year', 
                 y=trade_col
             )
             
             # Filter out rows where the trade_col value is NaN for robust plotting
-            plot_data = filtered_data_4.dropna(subset=[trade_col]).copy()
+            plot_data = filtered_df.dropna(subset=[trade_col]).copy()
 
             if not plot_data.empty:
                 fig = go.Figure()
@@ -389,22 +368,10 @@ with tab_metrics:
     with col5:
         # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
         st.header("Tariff Rate Across The Years")
-        year_range_5= st.slider(
-            'Select Year Range', 
-            min_value=int(trade_data_lk['Year'].min()), 
-            max_value=int(trade_data_lk['Year'].max()), 
-            value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
-            step=1,
-            key = 'slider_5'
-        )
-        filtered_data_5 = trade_data_lk[
-            (trade_data_lk['Year'] >= year_range_5[0]) & 
-            (trade_data_lk['Year'] <= year_range_5[1])
-        ]
         import statsmodels.api as sm
-        if not filtered_data_5.empty and filtered_data_5['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
+        if not filtered_df.empty and filtered_df['Tariff rate, applied, weighted mean, all products (%)'].notna().any():
             fig_5 = px.scatter(
-                filtered_data_5, 
+                filtered_df, 
                 x='Year', 
                 y='Tariff rate, applied, weighted mean, all products (%)',
                 labels={
@@ -421,10 +388,10 @@ with tab_dataset:
 
     st.markdown("<h1 style='text-align: center;'> Sri Lanka Trade Dataset Overview </h1>", unsafe_allow_html=True)    
 
-    st.dataframe(trade_data_lk)
+    st.dataframe(filtered_df)
     st.download_button(
         label="Download Dataset as CSV",
-        data=trade_data_lk.to_csv(index=False).encode('utf-8'),
+        data=filtered_df.to_csv(index=False).encode('utf-8'),
         file_name='sri_lanka_trade_data.csv',
         mime='text/csv'
     )
