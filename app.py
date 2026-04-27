@@ -75,6 +75,8 @@ global_year_range = st.sidebar.slider(
     value=(int(trade_data_lk['Year'].min()), int(trade_data_lk['Year'].max())), 
     step=1
 )
+st.sidebar.divider() # Add a divider in the sidebar
+
 
 # Filter data once for all visualizations
 filtered_df = trade_data_lk[
@@ -109,6 +111,7 @@ with tab_macro:
             )
         else:
             st.info("Data for this period is not available.")
+        st.divider() # Divider between V1 and V2 if they were in separate columns
     
     with col2:
 
@@ -131,6 +134,7 @@ with tab_macro:
                 st.bar_chart(x='Year', y=[select_box_2], data=filtered_df)
             else:
                 st.info("Data for this period is not available.")
+    st.divider() # Divider after V2
 
         #------Partner Composition Tab------
 with tab_partners:
@@ -199,6 +203,7 @@ with tab_partners:
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info(f"No merchandise export data available for {selected_year_3}.")
+    st.divider() # Divider after V3
 
 #------Trade Metrics Tab------
 with tab_metrics:
@@ -361,6 +366,7 @@ with tab_metrics:
                 st.plotly_chart(fig)
             else:
                 st.info("No valid data points for this period after removing NaNs.")
+            st.divider() # Divider between V4 and V5 if they were in separate columns
             # Display in Streamlit
         else:
             st.info("Data for this period is not available.")
@@ -383,11 +389,13 @@ with tab_metrics:
             st.plotly_chart(fig_5)
         else:
             st.info("Data for this period is not available.")
+    st.divider() # Divider after V5
 
 with tab_dataset:
 
     st.markdown("<h1 style='text-align: center;'> Sri Lanka Trade Dataset Overview </h1>", unsafe_allow_html=True)    
-
+    st.divider() # Divider after the header
+    
     st.dataframe(filtered_df)
     st.download_button(
         label="Download Dataset as CSV",
