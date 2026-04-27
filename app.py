@@ -80,6 +80,7 @@ with tab_macro:
     col1 , col2 = st.columns(2)
     with col1:
         #------Bar Chart: Exports and Imports of Goods & Services (Visualization No.1 (V1))------
+        st.subheader(f"Import & Export Trends over time")
 
         year_range = st.slider(
             'Select Year Range', 
@@ -93,7 +94,6 @@ with tab_macro:
             (trade_data_lk['Year'] >= year_range[0]) & 
             (trade_data_lk['Year'] <= year_range[1])
         ]
-        st.subheader(f"Import & Export Trends from {year_range[0]} to {year_range[1]}")
         v1_cols = ['Exports of Goods & Services (USD Billions)', 'Imports of Goods & Services (USD Billions)']
         if not filtered_data.empty and filtered_data[v1_cols].notna().any().any():
             st.bar_chart(
@@ -147,7 +147,7 @@ with tab_partners:
 
 
     #------Sunburst Diagram: Merchandise Export Composition (Visualization No.3(V3))------
-
+    st.subheader("Merchandise Export Destinations Distribution")
     #Year selector 
     available_years_3 = sorted([y for y in trade_data_lk['Year'].unique() if y != 2024], reverse=True)
     selected_year_3 = st.selectbox(
@@ -202,10 +202,9 @@ with tab_partners:
             sunburst_df,
             path=['Level 1', 'Level 2', 'Level 3'],
             values='Value',
-            title=f'Merchandise Export Destinations — {selected_year_3}',
             color='Level 1',
         )
-        st.subheader("Merchandise Export Destinations Distribution")
+        
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info(f"No merchandise export data available for {selected_year_3}.")
@@ -218,6 +217,7 @@ with tab_metrics:
     col4 , col5 = st.columns(2)
     #------Line Chart:Net barter terms of trade (Visualization No.4 (V4))------
     with col4:
+        st.header("Net Barter Terms of Trade Over Time")
         year_range_4= st.slider(
             'Select Year Range', 
             min_value=int(trade_data_lk['Year'].min()), 
@@ -239,8 +239,7 @@ with tab_metrics:
             fig = px.line(
                 filtered_data_4, 
                 x='Year', 
-                y=trade_col,
-                title="Net Barter Terms of Trade Over Time"
+                y=trade_col
             )
             
             # Filter out rows where the trade_col value is NaN for robust plotting
@@ -389,6 +388,7 @@ with tab_metrics:
 
     with col5:
         # ------Tariff Rate Across The Years For All Products: Line Chart (Visualization No.5)------
+        st.header("Tariff Rate Across The Years")
         year_range_5= st.slider(
             'Select Year Range', 
             min_value=int(trade_data_lk['Year'].min()), 
@@ -407,7 +407,6 @@ with tab_metrics:
                 filtered_data_5, 
                 x='Year', 
                 y='Tariff rate, applied, weighted mean, all products (%)',
-                title="Tariff Rate Across The Years For All Products",
                 labels={
                     "Year": "Year",
                     "Tariff rate, applied, weighted mean, all products (%)":"Applied Tariff Rate (%)"},
