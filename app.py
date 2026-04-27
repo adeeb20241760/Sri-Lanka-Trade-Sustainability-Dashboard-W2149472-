@@ -72,7 +72,7 @@ st.title("How does Sri Lanka's foreign trade impact its economic sustainability?
 tab_macro, tab_partners, tab_metrics , tab_dataset = st.tabs([
     "Macroeconomic Trends", 
     "Partner Composition", 
-    "Trade Metrics"
+    "Trade Metrics",
     "Dataset"
 ])
 
