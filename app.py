@@ -201,7 +201,7 @@ with tab_partners:
             values='Value',
             color='Level 1',
         )
-        
+        fig.update_layout(height=600)
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info(f"No merchandise export data available for {selected_year_3}.")
