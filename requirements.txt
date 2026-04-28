@@ -1,7 +1,5 @@
 streamlit
 pandas
 plotly
-plotly.express as px
-plotly.graph_objects as go
 statsmodels
 openpyxl
